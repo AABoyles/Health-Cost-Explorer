@@ -1,0 +1,7 @@
+.Rproj.user
+.Rhistory
+.RData
+*.Rda
+*.html
+data/orig/*
+creds.R

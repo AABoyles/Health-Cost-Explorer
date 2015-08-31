@@ -1,0 +1,6 @@
+#address-wrapper, #latitude-wrapper, #longitude-wrapper{
+  display:none;
+}
+.shiny-output-error{
+  display:none;
+}
