@@ -1,9 +1,12 @@
-Health Cost Explorer
-====================
+---
+title: "Health Cost Explorer"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
 
 *Driving across town could save you thousands.*
-
-HCE is a simple web application to display CMS health data. It can be accessed by going to http://shiny.aaboyles.com/Health-Cost-Explorer
 
 About the Data
 --------------
@@ -14,7 +17,9 @@ The only Financial column we're currently using is Average Total Payments.  Anno
 
 From the Inpatient Data Codebook:
 
-> Average Total Payments: The average of total payments to the provider for the APC including the Medicare APC amount. Also included in Total Payments are co-payment and deductible amounts that the patient is responsible for. 
+> Average Estimated Submitted Charges : The provider's average estimated submitted charge for services covered by Medicare for the APC. These will vary from hospital to hospital because of differences in hospital charge structures.
+
+> Average Total Payments: The average of total payments to the provider for the APC including the Medicare APC amount. Also included in Total Payments are co-payment and deductible amounts that the patient is responsible for.
 
 From the Outpatient Data Codebook
 
@@ -30,17 +35,12 @@ The Medicare Data Contains the Address, City, State, and zip codes. These were a
 
 All Raw Data was downloaded from [CMS](http://cms.gov).
 
-#### Outpatient Data
-
-* [2011](http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Outpatient2011.html)
-* [2012](http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Outpatient2012.html)
-* [2013](http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Outpatient2013.html)
-
-#### Inpatient Data
-
-* [2011](http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Inpatient2011.html)
-* [2012](http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Inpatient2012.html)
-* [2013](http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Inpatient2013.html)
+Outpatient Data | Inpatient Data
+----------------|---------------
+[2011](http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Outpatient2011.html) | [2011](http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Inpatient2011.html)
+[2012](http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Outpatient2012.html) | [2012](http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Inpatient2012.html)
+[2013](http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Outpatient2013.html) | [2013](http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Inpatient2013.html)
+[2014](http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Outpatient2014.html) | [2014](http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Inpatient2014.html)
 
 Under the Hood
 --------------
