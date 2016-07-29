@@ -49,7 +49,9 @@ Outpatient <- rbind(Outpatient11, Outpatient12, Outpatient13, Outpatient14) %>%
         " W "   = " with ",
         " W/O " = " without ",
         " Cc"   = " Complication or Co-morbidity",
-        " Mcc"  = " Major Complication or Co-morbidity"))
+        " Mcc"  = " Major Complication or Co-morbidity")),
+  	`Average  Estimated Submitted Charges` = round(`Average  Estimated Submitted Charges`, 2),
+  	`Average Total Payments` = round(`Average Total Payments`, 2)
   ) %>%
   rename(
     definition = APC,
@@ -93,7 +95,9 @@ Inpatient <- rbind(Inpatient11, Inpatient12, Inpatient13, Inpatient14) %>%
         " W/O " = " without ",
         " Cc"   = " Complication or Co-morbidity",
         " Mcc"  = " Major Complication or Co-morbidity")),
-    Patience = "Inpatient") %>%
+    `Average Covered Charges` = round(`Average Covered Charges`, 2),
+  	`Average Total Payments`  = round(`Average Total Payments`, 2),
+  	`Average Medicare Payments` = round(`Average Medicare Payments`, 2)) %>%
   rename(
     definition = `DRG Definition`,
     performed = `Total Discharges`
@@ -133,7 +137,7 @@ Providers <- rbind(InpatientProviders, OutpatientProviders) %>%
 
 ## Clean up! Clean up! Everybody, Everywhere!
 
-remove(Addresses, files, temp, retitle,
+remove(Addresses, files, retitle,
        Inpatient, InpatientProviders,
        Inpatient14, Inpatient13,
        Inpatient12, Inpatient11,
