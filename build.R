@@ -1,9 +1,6 @@
 #!/usr/bin/env R
 
-library("readr")
-library("magrittr")
-library("dplyr")
-library("stringr")
+source("deps.R")
 
 ## Get Raw Data
 
@@ -52,8 +49,8 @@ Outpatient <- rbind(Outpatient11, Outpatient12, Outpatient13, Outpatient14) %>%
         " W "   = " with ",
         " W/O " = " without ",
         " Cc"   = " Complication or Co-morbidity",
-        " Mcc"  = " Major Complication or Co-morbidity")),
-    patience = "Outpatient") %>%
+        " Mcc"  = " Major Complication or Co-morbidity"))
+  ) %>%
   rename(
     definition = APC,
     performed = `Outpatient Services`
