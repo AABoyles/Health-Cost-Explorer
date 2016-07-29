@@ -40,9 +40,10 @@ Outpatient14 <- read_csv("data/Medicare_Provider_Charge_Outpatient_APC32_CY2014.
   mutate(year = 2014) %>%
   retitle(colnames(Outpatient13))
 
-OutpatientData <- rbind(Outpatient11, Outpatient12, Outpatient13, Outpatient14) %>%
+Outpatient <- rbind(Outpatient11, Outpatient12, Outpatient13, Outpatient14) %>%
   mutate(
     `Provider Id` = str_pad(`Provider Id`, 6, "left", "0"),
+    `Provider Zip Code` = str_pad(`Provider Zip Code`, 5, "left", "0"),
     code = substr(APC, 0, 4),
     procedure = sub("(Level [[:alnum:]]*) (.*)", "\\2: \\1", substring(APC, 8), perl = TRUE) %>% 
       str_to_title() %>%
@@ -58,10 +59,15 @@ OutpatientData <- rbind(Outpatient11, Outpatient12, Outpatient13, Outpatient14) 
     performed = `Outpatient Services`
   )
 
-OutpatientProcedures <- OutpatientData %>%
+OutpatientData <- Outpatient %>%
   select(`Provider Id`, year, code, performed:`Average Total Payments`) %>%
   distinct %T>%
   write_csv("data/OutpatientProcedures.csv")
+
+OutpatientCodes <- Outpatient %>%
+  select(code, procedure) %>%
+  distinct %T>%
+  write_csv("data/OutpatientCodes.csv")
 
 ## Inpatient Data
 
@@ -77,9 +83,10 @@ Inpatient13 <- read_csv("data/Medicare_Provider_Charge_Inpatient_DRG100_FY2013.c
 Inpatient14 <- read_csv("data/Medicare_Provider_Charge_Inpatient_DRGALL_FY2014.csv") %>%
   mutate(year = 2014)
 
-InpatientData <- rbind(Inpatient11, Inpatient12, Inpatient13, Inpatient14) %>%
+Inpatient <- rbind(Inpatient11, Inpatient12, Inpatient13, Inpatient14) %>%
   mutate(
     `Provider Id` = str_pad(`Provider Id`, 6, "left", "0"),
+    `Provider Zip Code` = str_pad(`Provider Zip Code`, 5, "left", "0"),
     DRG = substring(`DRG Definition`, 1, 3),
     Procedure = substring(`DRG Definition`, 7) %>%
       str_to_title() %>%
@@ -95,27 +102,48 @@ InpatientData <- rbind(Inpatient11, Inpatient12, Inpatient13, Inpatient14) %>%
     performed = `Total Discharges`
   )
 
-InpatientProcedures <- InpatientData %>%
-  select(`Provider Id`, year, code, performed:`Average Medicare Payments`) %>%
+InpatientData <- Inpatient %>%
+  select(`Provider Id`, year, DRG, performed:`Average Medicare Payments`) %>%
   distinct %T>%
   write_csv("data/InpatientProcedures.csv")
+
+InpatientCodes <- Inpatient %>%
+  select(DRG, Procedure) %>%
+  distinct %>%
+  arrange(DRG) %T>%
+  write_csv("data/InpatientCodes.csv")
 
 ## Providers
 
 Addresses <- read_csv("data/geoCoded.csv")
 
-OutpatientProviders <- OutpatientData %>%
+OutpatientProviders <- Outpatient %>%
   select(starts_with("Provider"), hrr=`Hospital Referral Region (HRR) Description`)
 
-InpatientProviders <- InpatientData %>%
+InpatientProviders <- Inpatient %>%
   select(starts_with("Provider"), hrr=`Hospital Referral Region (HRR) Description`)
 
 Providers <- rbind(InpatientProviders, OutpatientProviders) %>%
-  distinct %>%
+  distinct(`Provider Id`, .keep_all = TRUE) %>%
   mutate(
+    `Provider Zip Code` = str_pad(`Provider Zip Code`, 5, "left", "0"),
     address = paste(`Provider Street Address`, `Provider City`, `Provider State`, sep = ", "),
     `Provider Name` = str_to_title(`Provider Name`)
   ) %>%
   left_join(Addresses) %>%
   select(-address) %T>%
   write_csv("data/Providers.csv")
+
+## Clean up! Clean up! Everybody, Everywhere!
+
+remove(Addresses, files, temp, retitle,
+       Inpatient, InpatientProviders,
+       Inpatient14, Inpatient13,
+       Inpatient12, Inpatient11,
+       Outpatient, OutpatientProviders,
+       Outpatient14, Outpatient13,
+       Outpatient12, Outpatient11)
+
+StateCentroids <- read_csv("data/StateCentroids.csv")
+
+save.image("data/Medicare_Data.rdata")
