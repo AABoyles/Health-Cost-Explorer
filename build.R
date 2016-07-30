@@ -1,6 +1,9 @@
 #!/usr/bin/env R
 
-source("deps.R")
+library("dplyr")
+library("stringr")
+library("readr")
+library("magrittr")
 
 ## Get Raw Data
 

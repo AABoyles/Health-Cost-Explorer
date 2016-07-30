@@ -1,11 +1,15 @@
 #!/usr/bin/env R
 
-source("deps.R")
+library("shiny")
+library("dplyr")
+library("stringr")
+library("leaflet")
+library("DT")
 
 load("data/Medicare_Data.rdata")
 
 shinyApp(
-  navbarPage("Health Cost Explorer", theme = shinytheme("cerulean"),
+  navbarPage("Health Cost Explorer", theme = "cerulean.min.css",
     tabPanel("Data",
       fluidRow(
         column(2, offset = 1, id = "controls",
@@ -27,7 +31,6 @@ shinyApp(
   ),
 
   shinyServer(function(input, output, session) {
-
    	thisData <- reactive({
   		if(input$code %in% InpatientCodes$Procedure){
   			code <- InpatientCodes %>%
