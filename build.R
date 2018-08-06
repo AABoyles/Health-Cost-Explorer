@@ -40,7 +40,11 @@ Outpatient14 <- read_csv("data/Medicare_Provider_Charge_Outpatient_APC32_CY2014.
   mutate(year = 2014) %>%
   retitle(colnames(Outpatient13))
 
-Outpatient <- rbind(Outpatient11, Outpatient12, Outpatient13, Outpatient14) %>%
+Outpatient15 <- read_csv("data/Medicare_Charge_Outpatient_APC28_CY2015_Provider.csv") %>%
+	mutate(year = 2015) %>%
+	retitle(colnames(Outpatient13))
+
+Outpatient <- rbind(Outpatient11, Outpatient12, Outpatient13, Outpatient14, Outpatient15) %>%
   mutate(
     `Provider Id` = str_pad(`Provider Id`, 6, "left", "0"),
     `Provider Zip Code` = str_pad(`Provider Zip Code`, 5, "left", "0"),
@@ -85,14 +89,17 @@ Inpatient13 <- read_csv("data/Medicare_Provider_Charge_Inpatient_DRG100_FY2013.c
 Inpatient14 <- read_csv("data/Medicare_Provider_Charge_Inpatient_DRGALL_FY2014.csv") %>%
   mutate(year = 2014)
 
-Inpatient <- rbind(Inpatient11, Inpatient12, Inpatient13, Inpatient14) %>%
+Inpatient15 <- read_csv("data/Medicare_Provider_Charge_Inpatient_DRGALL_FY2015.csv") %>%
+	mutate(year = 2015)
+
+Inpatient <- rbind(Inpatient11, Inpatient12, Inpatient13, Inpatient14, Inpatient15) %>%
   mutate(
     `Provider Id` = str_pad(`Provider Id`, 6, "left", "0"),
     `Provider Zip Code` = str_pad(`Provider Zip Code`, 5, "left", "0"),
     DRG = substring(`DRG Definition`, 1, 3),
     Procedure = substring(`DRG Definition`, 7) %>%
       str_to_title() %>%
-      str_replace_all(list(
+      str_replace_all(c(
         " & "   = " and ",
         " W "   = " with ",
         " W/O " = " without ",
@@ -107,7 +114,7 @@ Inpatient <- rbind(Inpatient11, Inpatient12, Inpatient13, Inpatient14) %>%
   )
 
 InpatientData <- Inpatient %>%
-  select(`Provider Id`, year, DRG, performed:`Average Medicare Payments`) %>%
+  select(`Provider Id`, year, Procedure, performed:`Average Medicare Payments`) %>%
   distinct %T>%
   write_csv("data/InpatientProcedures.csv")
 
@@ -142,9 +149,11 @@ Providers <- rbind(InpatientProviders, OutpatientProviders) %>%
 
 remove(Addresses, files, retitle,
        Inpatient, InpatientProviders,
+			 Inpatient15,
        Inpatient14, Inpatient13,
        Inpatient12, Inpatient11,
        Outpatient, OutpatientProviders,
+			 Outpatient15,
        Outpatient14, Outpatient13,
        Outpatient12, Outpatient11)
 
