@@ -10,11 +10,11 @@ library("plotly")
 load("data/Medicare_Data.rdata")
 
 shinyApp(
-  navbarPage("Health Cost Explorer", theme = "cerulean.min.css",
+  navbarPage("Medicare Cost Explorer", theme = "cerulean.min.css",
     tabPanel("Data",
       fluidRow(
         column(2, offset = 1, id = "controls",
-        	selectInput("year",  "Year", 2011:2015, selected = 2015),
+        	selectInput("year",  "Year", 2011:2017, selected = 2014),
           selectInput("state", "State", as.character(StateCentroids$Code), selected = "VA"),
           selectInput("code",  "Procedure", list("Outpatient" = OutpatientCodes$procedure, "Inpatient" = InpatientCodes$Procedure))),
         column(8,
@@ -38,13 +38,13 @@ shinyApp(
   			coder <- InpatientCodes %>%
   				filter(Procedure==input$code)
         InpatientData %>%
-        	filter(year==input$year, Procedure==coder$Procedure) ->
+        	filter(Procedure==coder$Procedure) ->
   				data
   		} else {
   			coder <- OutpatientCodes %>%
   				filter(procedure==input$code)
   			OutpatientData %>%
-        	filter(year==input$year, code==coder$code) ->
+        	filter(code==coder$code) ->
   				data
   		}
   		Providers %>%
@@ -92,7 +92,8 @@ shinyApp(
     			x = ~year,
     			y = ~`Average Total Payments`,
     			color = ~`Provider Name`
-    		)
+    		) %>%
+        layout(xaxis = list(dtick = 1))
     })
   })
 )
