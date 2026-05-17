@@ -392,3 +392,90 @@ remove(Addresses, files, modern_urls,
 StateCentroids <- read_csv("data/StateCentroids.csv", show_col_types = FALSE)
 
 save.image("data/Medicare_Data.rdata")
+
+## ── Medicaid Provider Spending (2018–2024) from HHS / HuggingFace ─────────────
+##
+## Source: https://opendata.hhs.gov/datasets/medicaid-provider-spending/
+## Mirrored as parquet on HuggingFace: HHS-Official/medicaid-provider-spending
+##
+## The raw dataset is 227M rows (provider NPI × HCPCS × month).  We use DuckDB
+## with its httpfs extension to query the remote parquet directly, aggregate to
+## year × HCPCS, and save a compact CSV — no need to download the full 2.94 GB.
+
+download_medicaid_data <- function(output_file = "data/MedicaidData.csv") {
+  if (file.exists(output_file)) {
+    message("Medicaid data already cached at ", output_file)
+    return(invisible(TRUE))
+  }
+
+  # ── Step 1: Discover parquet shard URLs ──────────────────────────────────────
+  message("Fetching Medicaid parquet shard list from HuggingFace...")
+  shard_info <- tryCatch(
+    fromJSON(paste0(
+      "https://datasets-server.huggingface.co/parquet",
+      "?dataset=HHS-Official/medicaid-provider-spending"
+    )),
+    error = function(e) {
+      message("  Cannot reach HuggingFace datasets-server: ", e$message)
+      NULL
+    }
+  )
+
+  if (is.null(shard_info) || is.null(shard_info$parquet_files)) {
+    message("  Parquet list unavailable — Medicaid data will be skipped.")
+    message("  Download manually from: https://opendata.hhs.gov/datasets/medicaid-provider-spending/")
+    return(invisible(FALSE))
+  }
+
+  files_df <- shard_info$parquet_files
+  # Prefer the "spending" split; fall back to first available split
+  spend_rows <- files_df[files_df$split == "spending", ]
+  if (nrow(spend_rows) == 0) spend_rows <- files_df
+  urls <- spend_rows$url
+  message("  Found ", length(urls), " parquet shard(s) across split '",
+          spend_rows$split[1], "'.")
+
+  # ── Step 2: Aggregate with DuckDB + httpfs ────────────────────────────────────
+  if (!requireNamespace("duckdb", quietly = TRUE)) {
+    message("  Package 'duckdb' not installed — run: install.packages('duckdb')")
+    message("  Medicaid data skipped.")
+    return(invisible(FALSE))
+  }
+
+  library(duckdb)
+  con <- dbConnect(duckdb::duckdb(), ":memory:")
+  on.exit(dbDisconnect(con, shutdown = TRUE), add = TRUE)
+
+  tryCatch({
+    dbExecute(con, "INSTALL httpfs; LOAD httpfs;")
+
+    url_list <- paste0("'", urls, "'", collapse = ", ")
+
+    query <- sprintf("
+      SELECT
+        CAST(LEFT(CLAIM_FROM_MONTH, 4) AS INTEGER) AS year,
+        HCPCS_CODE                                 AS hcpcs_code,
+        SUM(TOTAL_PAID)                            AS total_paid,
+        SUM(TOTAL_CLAIMS)                          AS total_claims,
+        SUM(TOTAL_UNIQUE_BENEFICIARIES)            AS total_beneficiaries
+      FROM read_parquet([%s])
+      WHERE TOTAL_PAID > 0
+      GROUP BY year, HCPCS_CODE
+      ORDER BY year, total_paid DESC
+    ", url_list)
+
+    message("  Aggregating Medicaid data via DuckDB (may take several minutes)...")
+    result <- dbGetQuery(con, query)
+
+    write_csv(result, output_file)
+    message("  Saved ", nrow(result), " HCPCS × year rows to ", output_file)
+    invisible(TRUE)
+
+  }, error = function(e) {
+    message("  DuckDB aggregation failed: ", e$message)
+    message("  Download manually from: https://opendata.hhs.gov/datasets/medicaid-provider-spending/")
+    invisible(FALSE)
+  })
+}
+
+download_medicaid_data()

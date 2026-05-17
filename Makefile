@@ -8,6 +8,9 @@ clean:
 	rm -f data/cms_inpatient_*.csv data/cms_outpatient_*.csv
 	rm -f data/Providers.csv data/Inpatient*.csv data/Outpatient*.csv
 
+clean-medicaid:
+	rm -f data/MedicaidData.csv
+
 clean-cache:
 	rm -f data/.cms_url_cache.rds
 
