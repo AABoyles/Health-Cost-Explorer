@@ -14,7 +14,10 @@ shinyApp(
     tabPanel("Data",
       fluidRow(
         column(2, offset = 1, id = "controls",
-        	selectInput("year",  "Year", 2011:2017, selected = 2014),
+        	selectInput("year",  "Year",
+        	            seq(min(c(InpatientData$year, OutpatientData$year), na.rm=TRUE),
+        	                max(c(InpatientData$year, OutpatientData$year), na.rm=TRUE)),
+        	            selected = max(c(InpatientData$year, OutpatientData$year), na.rm=TRUE)),
           selectInput("state", "State", as.character(StateCentroids$Code), selected = "VA"),
           selectInput("code",  "Procedure", list("Outpatient" = OutpatientCodes$procedure, "Inpatient" = InpatientCodes$Procedure))),
         column(8,
