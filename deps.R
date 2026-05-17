@@ -3,7 +3,7 @@
 libs <- c("magrittr", "readr", "dplyr", "stringr", "readxl", "jsonlite",
           "shiny", "DT", "leaflet", "shinythemes", "plotly", "scales", "duckdb")
 notInstalled <- setdiff(libs, as.vector(installed.packages()[, "Package"]))
-if(length(notInstalled > 0)){
+if (length(notInstalled) > 0) {
 	install.packages(notInstalled)
 }
 lapply(libs, library, character.only = TRUE)
